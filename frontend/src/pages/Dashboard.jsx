@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [uploadFile, setUploadFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,9 +79,10 @@ export default function Dashboard() {
 
   const handleUploadProof = async (winningId) => {
     if (!uploadFile) return alert('Select a file first');
+    if (uploading) return;
+    setUploading(true);
     const formData = new FormData();
     formData.append('proof', uploadFile);
-
     try {
       const headers = { 
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -88,9 +90,11 @@ export default function Dashboard() {
       };
       await axios.post(`${globalThis.API_URL}/winnings/upload-proof/${winningId}`, formData, { headers });
       alert('Proof uploaded successfully and is pending review!');
-      fetchData(); // refresh
+      fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Proof upload failed');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -193,7 +197,9 @@ export default function Dashboard() {
                       <div className="mt-4 pt-4 border-t border-dashed">
                         <p className="text-sm mb-2 font-bold text-gray-700">Action Required: Upload Screenshot Proof</p>
                         <input type="file" onChange={(e) => setUploadFile(e.target.files[0])} className="text-sm w-full mb-2" />
-                        <button onClick={() => handleUploadProof(w._id)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-sm font-bold">Upload Verification</button>
+                        <button onClick={() => handleUploadProof(w._id)} disabled={uploading} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-1 rounded text-sm font-bold">
+                          {uploading ? 'Uploading...' : 'Upload Verification'}
+                        </button>
                       </div>
                     )}
                     

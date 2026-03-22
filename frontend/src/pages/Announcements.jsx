@@ -6,6 +6,7 @@ export default function Announcements() {
   const [announcements, setAnnouncements] = useState([]);
   const [formData, setFormData] = useState({ title: '', content: '' });
   const [editingId, setEditingId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   
   const role = localStorage.getItem('role') || 'user';
   const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
@@ -25,6 +26,8 @@ export default function Announcements() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       if (editingId) {
         await axios.put(`${globalThis.API_URL}/announcements/${editingId}`, formData, { headers });
@@ -36,6 +39,8 @@ export default function Announcements() {
       fetchAnnouncements();
     } catch (err) {
       alert(err.response?.data?.message || 'Error processing request');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -91,8 +96,8 @@ export default function Announcements() {
               />
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="bg-green-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-green-700 transition">
-                {editingId ? 'Update Post' : 'Publish'}
+              <button type="submit" disabled={submitting} className="bg-green-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                {submitting ? 'Saving...' : editingId ? 'Update Post' : 'Publish'}
               </button>
               {editingId && (
                 <button type="button" onClick={() => { setEditingId(null); setFormData({title:'', content:''}); }} className="bg-gray-200 text-gray-700 font-bold px-6 py-2 rounded-lg hover:bg-gray-300 transition">
