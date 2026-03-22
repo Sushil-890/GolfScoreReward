@@ -17,7 +17,7 @@ export default function Navbar() {
     localStorage.removeItem('role');
     setIsOpen(false);
     setLogoutMsg('Signed out successfully');
-    setTimeout(() => navigate('/'), 1500);
+    setTimeout(() => navigate('/login'), 1500);
   };
 
   const navLinks = () => {
