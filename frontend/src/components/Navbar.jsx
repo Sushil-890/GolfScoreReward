@@ -10,11 +10,14 @@ export default function Navbar() {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role') || 'user';
 
+  const [logoutMsg, setLogoutMsg] = useState('');
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-    navigate('/login');
     setIsOpen(false);
+    setLogoutMsg('Signed out successfully');
+    setTimeout(() => navigate('/'), 1500);
   };
 
   const navLinks = () => {
@@ -51,6 +54,11 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gradient-to-r from-green-800 to-green-600 text-white shadow-lg sticky top-0 z-50">
+      {logoutMsg && (
+        <div className="bg-green-500 text-white text-center text-sm py-2 font-semibold">
+          {logoutMsg}
+        </div>
+      )}
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-black tracking-tight flex items-center gap-2">
           Digital<span className="text-green-300">Heroes</span>

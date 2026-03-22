@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="32" fill="#166534"/>
+  
+  <!-- Trophy cup body -->
+  <path d="M22 18 h20 l-4 16 a6 6 0 0 1-12 0 Z" fill="#facc15" stroke="#ca8a04" stroke-width="1.5"/>
+  
+  <!-- Trophy handles -->
+  <path d="M22 22 q-6 2 -5 8 q1 4 5 4" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M42 22 q6 2 5 8 q-1 4 -5 4" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Trophy stem -->
+  <rect x="29" y="34" width="6" height="5" fill="#facc15"/>
+  
+  <!-- Trophy base -->
+  <rect x="24" y="39" width="16" height="3.5" rx="1.5" fill="#facc15" stroke="#ca8a04" stroke-width="1"/>
+
+  <!-- Star on trophy -->
+  <polygon points="32,21 33.5,25.5 38,25.5 34.5,28 36,32.5 32,30 28,32.5 29.5,28 26,25.5 30.5,25.5" fill="#fff" opacity="0.9"/>
+
+  <!-- Golf ball (small, bottom right) -->
+  <circle cx="46" cy="46" r="8" fill="white" stroke="#d1d5db" stroke-width="0.5"/>
+  <circle cx="44" cy="44" r="1" fill="#9ca3af"/>
+  <circle cx="47" cy="46" r="1" fill="#9ca3af"/>
+  <circle cx="45" cy="48" r="1" fill="#9ca3af"/>
+  <circle cx="48" cy="44" r="1" fill="#9ca3af"/>
+</svg>
