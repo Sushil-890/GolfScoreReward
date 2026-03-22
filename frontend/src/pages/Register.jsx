@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-export default function Register() {
+export default function Register({ onLogin }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
   const [charities, setCharities] = useState([]);
   const [charityId, setCharityId] = useState('');
   const [percentage, setPercentage] = useState(10);
-  
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch available charities
@@ -34,7 +31,7 @@ export default function Register() {
       });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.user.role || 'user');
-      window.location.href = res.data.user.role === 'admin' ? '/admin' : '/subscribe';
+      onLogin?.(res.data.token, res.data.user.role || 'user');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     }

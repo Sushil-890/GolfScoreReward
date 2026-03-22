@@ -5,19 +5,17 @@ import Footer from './Footer';
 import Sidebar from './Sidebar';
 import { Menu } from 'lucide-react';
 
-export default function Layout({ children }) {
+export default function Layout({ children, onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const token = localStorage.getItem('token');
   
-  // Routes where we want strict public/unauthenticated view
   const isPublicRoute = ['/login', '/register', '/'].includes(location.pathname);
 
-  // If unauthenticated or actively looking at a public route
   if (!token || isPublicRoute) {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50">
-        <Navbar />
+        <Navbar onLogout={onLogout} />
         <main className="flex-grow container mx-auto px-4 py-8">
           {children}
         </main>
@@ -26,10 +24,9 @@ export default function Layout({ children }) {
     );
   }
 
-  // Dashboard Shell Configuration
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
-      <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} onLogout={onLogout} />
       
       {/* Main Content Pane */}
       <div className="flex-1 flex flex-col min-h-screen md:ml-64 w-full min-w-0 transition-all duration-300 ease-in-out">

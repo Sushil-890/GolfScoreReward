@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,7 +13,7 @@ export default function Login() {
       const res = await axios.post(`${globalThis.API_URL}/auth/login`, { email, password });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.user.role);
-      window.location.href = res.data.user.role === 'admin' ? '/admin' : '/dashboard';
+      onLogin?.(res.data.token, res.data.user.role);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     }

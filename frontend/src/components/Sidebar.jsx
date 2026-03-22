@@ -1,15 +1,13 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, CreditCard, UserCircle, LogOut, ShieldAlert, Megaphone } from 'lucide-react';
 
-export default function Sidebar({ mobileOpen, setMobileOpen }) {
+export default function Sidebar({ mobileOpen, setMobileOpen, onLogout }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const role = localStorage.getItem('role') || 'user';
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    navigate('/login');
+    setMobileOpen(false);
+    onLogout?.();
   };
 
   const navItemClass = (path) => `
@@ -47,7 +45,7 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-4 space-y-2 mt-4">
+        <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-2">
           <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-2">Core Platform</div>
           
           {role === 'admin' ? (
@@ -77,8 +75,8 @@ export default function Sidebar({ mobileOpen, setMobileOpen }) {
           </Link>
         </nav>
 
-        {/* Bottom Logout */}
-        <div className="p-4 border-t border-gray-100 mb-4">
+        {/* Bottom Logout - always pinned */}
+        <div className="shrink-0 p-4 border-t border-gray-100">
           <button 
             onClick={handleLogout} 
             className="flex items-center gap-3 w-full px-4 py-3 text-red-500 font-semibold hover:bg-red-50 rounded-xl transition"

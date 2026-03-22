@@ -2,19 +2,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
-export default function Navbar() {
+export default function Navbar({ onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role') || 'user';
 
-
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
     setIsOpen(false);
-    window.location.href = '/login';
+    onLogout?.();
   };
 
   const navLinks = () => {
