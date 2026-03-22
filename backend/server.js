@@ -15,25 +15,22 @@ const announcementRoutes = require('./routes/announcement');
 const app = express();
 
 // Middleware
-const allowedOrigins = [
-  process.env.FRONTEND_URL, 
-  process.env.FRONTEND_URL_PROD,
-  'http://localhost:5173' // Hardcoded fallback for local dev
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true
-}));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
+
+// Ensure DB is connected before every request (handles serverless cold starts)
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState === 0) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log('MongoDB reconnected');
+    } catch (err) {
+      console.error('MongoDB reconnect FAIL', err);
+      return res.status(500).json({ message: 'Database connection failed' });
+    }
+  }
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -50,7 +47,10 @@ app.use('/api/announcements', announcementRoutes);
 // Database connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+      bufferCommands: false
+    });
     console.log('MongoDB connection SUCCESS');
   } catch (err) {
     console.error('MongoDB connection FAIL', err);
