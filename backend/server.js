@@ -18,18 +18,32 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Ensure DB is connected before every request (handles serverless cold starts)
-app.use(async (req, res, next) => {
-  if (mongoose.connection.readyState === 0) {
-    try {
-      await mongoose.connect(process.env.MONGO_URI);
-      console.log('MongoDB reconnected');
-    } catch (err) {
-      console.error('MongoDB reconnect FAIL', err);
-      return res.status(500).json({ message: 'Database connection failed' });
-    }
+// Database connection - cached for serverless
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) return;
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+      bufferCommands: false
+    });
+    isConnected = true;
+    console.log('MongoDB connection SUCCESS');
+  } catch (err) {
+    console.error('MongoDB connection FAIL', err);
+    throw err;
   }
-  next();
+};
+
+// Ensure DB connected before every request
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    return res.status(500).json({ message: 'Database connection failed' });
+  }
 });
 
 // Routes
@@ -41,23 +55,11 @@ app.use('/api/subscriptions', subRoutes);
 app.use('/api/winnings', winningRoutes);
 app.use('/api/announcements', announcementRoutes);
 
-// // Expose uploads directory statically for proof images (Not required as we now use Cloudinary)
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Export for Vercel serverless
+module.exports = app;
 
-// Database connection
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-      bufferCommands: false
-    });
-    console.log('MongoDB connection SUCCESS');
-  } catch (err) {
-    console.error('MongoDB connection FAIL', err);
-  }
-};
-
-connectDB();
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Local dev only
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
